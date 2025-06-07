@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 from utils.data_utils import read_client_data
-from models.config import load_model
+from model.config import load_model
 from torch.utils.data import DataLoader
 
 
@@ -57,7 +57,8 @@ class BaseClient():
 
     def train(self):
         # === train ===
-        batch_loss = []
+        total_loss = 0.0
+
         for epoch in range(self.epoch):
             for idx, data in enumerate(self.loader_train):
                 X, y = self.preprocess(data)
@@ -67,10 +68,11 @@ class BaseClient():
                 self.optim.zero_grad()
                 loss.backward()
                 self.optim.step()
-                batch_loss.append(loss.item())
+
+                total_loss += loss.item()
 
         # === record loss ===
-        self.metric['loss'] = sum(batch_loss) / len(batch_loss)
+        self.metric['loss'] = total_loss / len(self.loader_train)
 
     def clone_model(self, target):
         p_tensor = target.model2tensor()
