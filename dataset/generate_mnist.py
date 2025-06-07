@@ -1,0 +1,38 @@
+import numpy as np
+import os
+import random
+import torchvision
+import torchvision.transforms as transforms
+import yaml
+
+from utils.dataset_utils import check, separate_data, split_data, save_file
+
+random.seed(1)
+np.random.seed(1)
+
+def generate_dataset(cfg):
+    dir_path = cfg['dir_path']
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    if check(cfg): return
+
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
+    trainset = torchvision.datasets.MNIST(root=os.path.join(dir_path, "rawdata"),
+                                          train=True, download=True, transform=transform)
+    testset = torchvision.datasets.MNIST(root=os.path.join(dir_path, "rawdata"),
+                                         train=False, download=True, transform=transform)
+
+    X = np.concatenate([trainset.data.numpy(), testset.data.numpy()])
+    y = np.concatenate([trainset.targets.numpy(), testset.targets.numpy()])
+
+    cfg['class_num'] = len(set(y))
+    X, y, statistic = separate_data((X, y), cfg)
+    train_data, test_data = split_data(X, y, cfg)
+    save_file(train_data, test_data, cfg)
+
+
+if __name__ == "__main__":
+    with open('config.yaml', 'r') as f:
+        config = yaml.load(f.read(), Loader=yaml.Loader)
+    generate_dataset(config)
