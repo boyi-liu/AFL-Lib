@@ -1,0 +1,22 @@
+# basic config
+alg: fedavg
+suffix: default
+device: 1
+dataset: mnist
+model: mlp
+
+# federated config
+total_num: 100
+sr: 0.1
+rnd: 10
+test_gap: 1
+
+# local training config
+bs: 64
+epoch: 5
+lr: 0.01
+gamma: 0.99
+
+decay: 0.3
+delay: 5
+delay_rate: 0.3

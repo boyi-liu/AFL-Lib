@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 class FedSim:
     def __init__(self, args):
         self.args = args
-
+        args.suffix = f'exp/{args.suffix}'
         if not os.path.exists(f'./{args.suffix}'):
             os.makedirs(f'./{args.suffix}')
 

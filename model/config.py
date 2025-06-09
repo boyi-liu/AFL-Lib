@@ -21,6 +21,8 @@ def name_filter(dataset_arg):
         return 'harbox'
     elif 'agnews' in dataset_arg:
         return 'agnews'
+    elif 'mnist' in dataset_arg:
+        return 'mnist'
     return 'Unknown dataset'
 
 
@@ -31,5 +33,5 @@ def load_model(args):
         exit('Dataset params not exist (in config.py)!')
 
     model_arg = args.model
-    model_module = importlib.import_module(f'models.{model_arg}')
+    model_module = importlib.import_module(f'model.{model_arg}')
     return getattr(model_module, f'{model_arg}_{dataset_arg}')(args)
