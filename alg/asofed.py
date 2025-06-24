@@ -21,6 +21,9 @@ class Client(AsyncBaseClient):
 
     @time_record
     def run(self):
+        self.train()
+
+    def train(self):
         w_global = self.model2tensor()
         
         total_loss = 0.0
@@ -62,10 +65,20 @@ class Client(AsyncBaseClient):
 
 class Server(AsyncBaseServer):
     def aggregate(self):
+        # update w
         zeta = self.cur_client.zeta_grad
         model_g = self.model2tensor()
         model_g -= (zeta * len(self.cur_client.dataset_train)) / sum(len(c.dataset_train) for c in self.clients)
         self.tensor2model(model_g)
+
+        # update w with feature learning
+        # def feature_update(W):
+        #     alpha = torch.softmax(torch.abs(W), dim=0)
+        #     return alpha * W
+        # with torch.no_grad():
+        #     W = next(self.model.parameters())
+        #     W.copy_(feature_update(W))
+
 
     def run(self):
         self.sample()
