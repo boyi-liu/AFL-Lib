@@ -33,7 +33,6 @@ class Server(AsyncBaseServer):
 
     def aggregate(self):
         self.buffer.append(self.cur_client.dW)
-        self.cur_client.status = Status.IDLE
 
         if len(self.buffer) == self.args.k:
             t_g = self.model2tensor()
