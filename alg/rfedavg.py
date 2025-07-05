@@ -1,7 +1,7 @@
 import torch
 
 from utils.time_utils import time_record
-from trainer.base import BaseServer, BaseClient
+from alg.base import BaseServer, BaseClient
 
 def mmd(X, Y):
     X_avg = torch.sum(X, dim=0) / X.shape[0]
@@ -13,8 +13,8 @@ def add_args(parser):
     return parser.parse_args()
 
 class Client(BaseClient):
-    def __init__(self, id, args, dataset):
-        super().__init__(id, args, dataset)
+    def __init__(self, id, args):
+        super().__init__(id, args)
         self.features = []
         self.lam = args.lam
 
@@ -47,8 +47,8 @@ class Client(BaseClient):
 
 
 class Server(BaseServer):
-    def __init__(self, id, args, dataset, clients):
-        super().__init__(id, args, dataset, clients)
+    def __init__(self, id, args, clients):
+        super().__init__(id, args, clients)
         self.features = []
 
     def run(self):
