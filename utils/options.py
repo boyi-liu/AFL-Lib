@@ -28,20 +28,16 @@ def args_parser():
     # ===== Async Setting =====
     parser.add_argument('--decay', type=float, default=0.3, help="Basic weight decay in asynchronous aggregation")
 
-    # ===== System Heterogeneity Setting =====
-    parser.add_argument('--delay', type=int, default=5, help="Delay level used to simulate latency of device")
-    parser.add_argument('--delay_rate', type=float, default=0.3, help="Proportion of stale device")
-
-
-    # === read specific parameters from each method
-    args, _ = parser.parse_known_args()
-    alg_module = importlib.import_module(f'alg.{args.alg}')
-    spec_args = alg_module.add_args(parser) if hasattr(alg_module, 'add_args') else args
-
-    # === read params from yaml ===
-    # NOTE: Only overwrite when the value is None
+    # === read args from yaml ===
     with open('config.yaml', 'r') as f:
         yaml_config = yaml.load(f.read(), Loader=yaml.Loader)
-    for k, v in vars(spec_args).items():
-        if v is None: setattr(spec_args, k, yaml_config[k])
+    for k, v in yaml_config.items():
+        parser.set_defaults(**{k: v})
+
+    # === read args from command ===
+    args, _ = parser.parse_known_args()
+
+    # === read specific args from each method
+    alg_module = importlib.import_module(f'alg.{args.alg}')
+    spec_args = alg_module.add_args(parser) if hasattr(alg_module, 'add_args') else args
     return spec_args
