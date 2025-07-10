@@ -5,7 +5,7 @@ import numpy as np
 
 def add_args(parser):
     parser.add_argument('--beta', type=float, default=0.5, help='staleness penalty factor')
-    parser.add_argument('--b', type=float, default=2, help='determine whether to aggregate')
+    parser.add_argument('--b', type=float, default=5, help='determine whether to aggregate')
     return parser.parse_args()
 
 
@@ -74,7 +74,8 @@ class Server(AsyncBaseServer):
         idle_clients = [c for c in self.clients if c.status != Status.ACTIVE]
 
         for c in idle_clients:
-            avg_staleness = sum(self.staleness_history[c.id]) / len(self.staleness_history[c.id])
+            avg_staleness = sum(self.staleness_history[c.id]) / len(self.staleness_history[c.id]) \
+                if len(self.staleness_history[c.id] )> 0 else 0
             c.u = c.data_quality / pow(1 + avg_staleness, self.beta)
         self.sampled_clients = sorted(idle_clients, key=lambda c: c.u, reverse=True)[:self.MAX_CONCURRENCY - active_num]
 
@@ -83,15 +84,12 @@ class Server(AsyncBaseServer):
 
     
     def aggregate(self):
-        cur_id = self.cur_client.id
-        self.profiled_latency[cur_id] = self.cur_client.traininig_time
-        self.staleness_history[cur_id].append(self.staleness[cur_id])
         self.buffer.append(self.cur_client.model2tensor())
 
-        AGGR = (self.wall_clock_time - self.last_aggr_time > max(self.profiled_latency[cur_id]) / self.b)
+        AGGR = (self.wall_clock_time - self.last_aggr_time > max(self.profiled_latency) / self.b)
         if AGGR:
             self.last_aggr_time = self.wall_clock_time
-            self.tensor2model(sum(self.received_params))
+            self.tensor2model(sum(self.buffer) / len(self.buffer))
 
     def update_status(self):
         # set the current client to idle
@@ -99,6 +97,9 @@ class Server(AsyncBaseServer):
 
         # add staleness to historical information
         self.staleness_history[self.cur_client.id].append(self.staleness[self.cur_client.id])
+
+        # profile latency
+        self.profiled_latency[self.cur_client.id] = self.cur_client.training_time
 
         # update the staleness
         if self.AGGR:
