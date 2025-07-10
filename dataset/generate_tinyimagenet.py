@@ -62,15 +62,10 @@ def generate_dataset(cfg):
     trainset = ImageFolder_custom(root=dir_path + 'rawdata/tiny-imagenet-200/train/', transform=transform)
     testset = ImageFolder_custom(root=dir_path + 'rawdata/tiny-imagenet-200/val/', transform=transform)
 
-    trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=len(trainset), shuffle=False)
-    testloader = torch.utils.data.DataLoader(
-        testset, batch_size=len(testset), shuffle=False)
-
-    for _, train_data in enumerate(trainloader, 0):
-        trainset.data, trainset.targets = train_data
-    for _, test_data in enumerate(testloader, 0):
-        testset.data, testset.targets = test_data
+    trainset.data, trainset.targets = next(
+        iter(torch.utils.data.DataLoader(trainset, batch_size=len(trainset), shuffle=False)))
+    testset.data, testset.targets = next(
+        iter(torch.utils.data.DataLoader(testset, batch_size=len(testset), shuffle=False)))
 
     X = np.concatenate([trainset.data.numpy(), testset.data.numpy()])
     y = np.concatenate([trainset.targets.numpy(), testset.targets.numpy()])

@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import random
+import torch
 import torchvision
 import torchvision.transforms as transforms
 import yaml
@@ -22,7 +23,10 @@ def generate_dataset(cfg):
                                           split='train', download=True, transform=transform)
     testset = torchvision.datasets.SVHN(root=os.path.join(dir_path, "rawdata"),
                                          split='test', download=True, transform=transform)
-
+    trainset.data, trainset.targets = next(
+        iter(torch.utils.data.DataLoader(trainset, batch_size=len(trainset), shuffle=False)))
+    testset.data, testset.targets = next(
+        iter(torch.utils.data.DataLoader(testset, batch_size=len(testset), shuffle=False)))
     X = np.concatenate([trainset.data.numpy(), testset.data.numpy()])
     y = np.concatenate([trainset.labels.numpy(), testset.labels.numpy()])
 
