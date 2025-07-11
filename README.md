@@ -1,4 +1,4 @@
-# AsyncFL-Lib
+# AFL-Lib
 
 🔥 **Asynchronous Federated Learning (AFL)** Library and Benchmark.
 
