@@ -1,0 +1,19 @@
+# device heterogeneity config
+dev:
+  ## Pi, Nano, TX2
+  dev_prop: 0.1 0.2 0.3
+
+# communication heterogeneity config
+comm:
+  comm: True
+  ## WiFi, 5G, 4G
+  comm_prop: 0.1 0.2 0.3
+
+
+# dropout config
+dropout:
+  dropout: False
+  drop_latency: 10
+  ## possibility of drop out
+  drop_prob: 0.1
+

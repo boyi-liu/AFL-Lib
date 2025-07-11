@@ -1,13 +1,15 @@
 import importlib
-
 import torch
 import torch.nn as nn
 import random
 import numpy as np
+import yaml
 
 from utils.data_utils import read_client_data
 from model.config import load_model
 from torch.utils.data import DataLoader
+
+from utils.sys_utils import device_config, comm_config
 
 
 class BaseClient():
@@ -49,8 +51,10 @@ class BaseClient():
             )
 
         self.training_time = None
-        self.delay = args.delay if self.id < (args.total_num * args.delay_rate) else 1
-        self.weight = 1
+        with open('utils/sys.yaml', 'r') as f:
+            self.sysconfig = yaml.load(f.read(), Loader=yaml.Loader)
+        self.delay = device_config(self.id, args.total_num)
+        self.comm_time = comm_config(self.id, args.total_num, self.model)
 
     def run(self):
         raise NotImplementedError
@@ -60,7 +64,7 @@ class BaseClient():
         total_loss = 0.0
 
         for epoch in range(self.epoch):
-            for idx, data in enumerate(self.loader_train):
+            for data in self.loader_train:
                 X, y = self.preprocess(data)
                 preds = self.model(X)
                 loss = self.loss_func(preds, y)

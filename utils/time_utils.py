@@ -12,6 +12,9 @@ def time_record(func):
         execution_time = end_time - start_time
         self.training_time = execution_time * self.delay
 
+        # downlink and uplink
+        self.training_time += self.comm_time * 2
+
         dropout = self.sysconfig['dropout']
         if dropout['dropout'] and random.random() < dropout['drop_prob']:
             self.training_time += (random.random() * dropout['drop_latency'])
