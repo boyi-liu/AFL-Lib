@@ -1,6 +1,6 @@
-# Asynchronous FL Bench
+# AsyncFL-Lib
 
-🔥 **Asynchronous Federated Learning (AFL)** codebase.
+🔥 **Asynchronous Federated Learning (AFL)** Library and Benchmark.
 
 Currently, we support: 
 
@@ -9,7 +9,7 @@ Currently, we support:
   + Device heterogeneity
   + Communication heterogeneity
   + Device dropout
-+ 7 datasets covering image, text, sensor.
++ 7 datasets covering modalities like image, text, sensor.
 + 3 data heterogeneity setup. 
 
 
