@@ -3,8 +3,8 @@ partition: dir  # partition method, including ['iid', 'dir', 'pat', 'group']
 train_ratio: 0.75  # train data ratio
 batch_size: 10  # batch size
 
-client_num: 100  # number of clients
-dir_path: mnist  # dataset path
+client_num: 20  # number of clients
+dir_path: CREMA-D  # dataset path
 
 # ===== Dirichlet =====
 alpha: 0.1  # Dirichlet distribution parameter, used in 'dir' partition method
