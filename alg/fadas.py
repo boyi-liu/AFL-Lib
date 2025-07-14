@@ -5,12 +5,12 @@ from utils.time_utils import time_record
 
 
 def add_args(parser):
-    parser.add_argument('--M', type=int, default=10, help='buffer size M for FADAS')
-    parser.add_argument('--tau_c', type=int, default=5, help='delay threshold')
+    parser.add_argument('--M', type=int, default=5, help='buffer size M for FADAS')
+    parser.add_argument('--tau_c', type=int, default=1, help='delay threshold')
     parser.add_argument('--beta1', type=float, default=0.9, help='beta1 for AMSGrad')
-    parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for AMSGrad')
+    parser.add_argument('--beta2', type=float, default=0.99, help='beta2 for AMSGrad')
     parser.add_argument('--epsilon', type=float, default=1e-8, help='epsilon for AMSGrad')
-    parser.add_argument('--eta', type=float, default=0.01, help='global learning rate')
+    parser.add_argument('--eta', type=float, default=0.001, help='global learning rate')
     
     return parser.parse_args()
 

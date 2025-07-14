@@ -5,7 +5,7 @@ import numpy as np
 
 def add_args(parser):
     parser.add_argument('--beta', type=float, default=0.5, help='staleness penalty factor')
-    parser.add_argument('--b', type=float, default=5, help='determine whether to aggregate')
+    parser.add_argument('--b', type=float, default=10, help='determine whether to aggregate')
     return parser.parse_args()
 
 

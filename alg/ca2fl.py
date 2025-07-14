@@ -5,7 +5,7 @@ import torch
 
 
 def add_args(parser):
-    parser.add_argument('--M', type=int, default=5, help='buffer size M for CA2FL')
+    parser.add_argument('--M', type=int, default=10, help='buffer size M for CA2FL')
     parser.add_argument('--eta', type=float, default=0.01, help='gloal lr')
     return parser.parse_args()
 

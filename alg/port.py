@@ -6,10 +6,10 @@ from enum import Enum
 from utils.time_utils import time_record
 
 def add_args(parser):
-    parser.add_argument('--alpha', type=float, default=1.0)
+    parser.add_argument('--alpha', type=float, default=3.0)
     parser.add_argument('--beta', type=float, default=1.0)
-    parser.add_argument('--omega', type=int, default=5)
-    parser.add_argument('--min_clients', type=int, default=5)
+    parser.add_argument('--omega', type=int, default=10)
+    parser.add_argument('--min_clients', type=int, default=10)
     return parser.parse_args()
 
 class EventStatus(Enum):
