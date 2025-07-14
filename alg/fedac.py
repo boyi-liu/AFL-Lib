@@ -16,18 +16,36 @@ class Client(AsyncBaseClient):
         super().__init__(id, args)
         self.C = torch.zeros_like(self.model2tensor())
 
+    def train(self):
+        # === train ===
+        total_loss = 0.0
+
+        for epoch in range(self.epoch):
+            for data in self.loader_train:
+                X, y = self.preprocess(data)
+                preds = self.model(X)
+                loss = self.loss_func(preds, y)
+
+                self.optim.zero_grad()
+                loss.backward()
+                self.optim.step()
+
+                cur_model = self.model2tensor() - self.lr * (self.server.C - self.C)
+                self.tensor2model(cur_model)
+
+                total_loss += loss.item()
+
+        # === record loss ===
+        self.metric['loss'] = total_loss / len(self.loader_train)
+
     @time_record
     def run(self):
         self.prev_model = self.model2tensor()
-        C_global = self.server.C
 
         self.train()
 
-
-        cur_model = self.model2tensor() - self.lr * (C_global - self.C)
-        self.tensor2model(cur_model)
-
-        hat_C = ((self.prev_model - cur_model) - (C_global - self.C)) / (self.epoch * self.lr)
+        cur_model = self.model2tensor()
+        hat_C = ((self.prev_model - cur_model) - (self.server.C - self.C)) / (self.epoch * self.lr)
         self.dC = hat_C - self.C
         self.C = hat_C
 
