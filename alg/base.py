@@ -113,7 +113,7 @@ class BaseClient():
     def model2tensor(self, params=None):
         alg_module = importlib.import_module(f'alg.{self.args.alg}')
         p_keys = getattr(alg_module, 'p_keys') if hasattr(alg_module, 'p_keys') else []
-        p_params = [any(key in name for key in p_keys)
+        p_params = [any(key == name.split('.')[0] for key in p_keys)
                     for name, _ in self.model.named_parameters()]
         selected_params = params if params is not None else [not is_p for is_p in p_params]
 
@@ -124,7 +124,7 @@ class BaseClient():
     def tensor2model(self, tensor, params=None):
         alg_module = importlib.import_module(f'alg.{self.args.alg}')
         p_keys = getattr(alg_module, 'p_keys') if hasattr(alg_module, 'p_keys') else []
-        p_params = [any(key in name for key in p_keys)
+        p_params = [any(key == name.split('.')[0] for key in p_keys)
                     for name, _ in self.model.named_parameters()]
         selected_params = params if params is not None else [not is_p for is_p in p_params]
 
