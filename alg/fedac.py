@@ -6,8 +6,8 @@ from utils.time_utils import time_record
 def add_args(parser):
     parser.add_argument('--beta1', type=float, default=0.6)
     parser.add_argument('--beta2', type=float, default=0.9)
-    parser.add_argument('--buffer_size', type=int, default=20)
-    parser.add_argument('--eta_g', type=float, default=1)
+    parser.add_argument('--buffer_size', type=int, default=5)
+    parser.add_argument('--eta_g', type=float, default=0.001)
     return parser.parse_args()
 
 
@@ -16,33 +16,12 @@ class Client(AsyncBaseClient):
         super().__init__(id, args)
         self.C = torch.zeros_like(self.model2tensor())
 
-    def train(self):
-        # === train ===
-        total_loss = 0.0
-
-        for epoch in range(self.epoch):
-            for data in self.loader_train:
-                X, y = self.preprocess(data)
-                preds = self.model(X)
-                loss = self.loss_func(preds, y)
-
-                self.optim.zero_grad()
-                loss.backward()
-                self.optim.step()
-
-                cur_model = self.model2tensor() - self.lr * (self.server.C - self.C)
-                self.tensor2model(cur_model)
-
-                total_loss += loss.item()
-
-        # === record loss ===
-        self.metric['loss'] = total_loss / len(self.loader_train)
-
     @time_record
     def run(self):
         self.prev_model = self.model2tensor()
 
         self.train()
+        self.tensor2model(self.model2tensor() - self.lr * (self.server.C - self.C))
 
         cur_model = self.model2tensor()
         hat_C = (self.prev_model - cur_model) / (self.epoch * self.lr) - (self.server.C - self.C)
@@ -90,8 +69,8 @@ class Server(AsyncBaseServer):
             r_list = []
             for dW, prev_model in zip(self.dW_buffer, self.prev_model_buffer):
                 delta_global = (self.model2tensor() - prev_model) if self.round > self.buffer_size else self.model2tensor()
-                r = torch.nn.functional.cosine_similarity(delta_global, dW, dim=0)
-                r_list.append(max(r, 0))
+                r = torch.nn.functional.cosine_similarity(delta_global, dW, dim=0).item()
+                r_list.append(max(r, 0.1))
             w_list = [r / (sum(r_list) + self.epsilon) for r in r_list]
 
             # update model
