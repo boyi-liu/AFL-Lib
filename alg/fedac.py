@@ -45,7 +45,7 @@ class Client(AsyncBaseClient):
         self.train()
 
         cur_model = self.model2tensor()
-        hat_C = ((self.prev_model - cur_model) - (self.server.C - self.C)) / (self.epoch * self.lr)
+        hat_C = (self.prev_model - cur_model) / (self.epoch * self.lr) - (self.server.C - self.C)
         self.dC = hat_C - self.C
         self.C = hat_C
 
