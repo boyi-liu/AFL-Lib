@@ -32,7 +32,6 @@ class Client(AsyncBaseClient):
                 total_loss += loss.item()
                 data_quality += loss.item() ** 2
 
-        # === record loss ===
         self.metric['loss'] = total_loss / len(self.loader_train)
         self.metric['data_quality'] = data_quality / len(self.loader_train)
 
@@ -85,11 +84,18 @@ class Server(AsyncBaseServer):
     
     def aggregate(self):
         self.buffer.append(self.cur_client.model2tensor())
-
-        AGGR = (self.wall_clock_time - self.last_aggr_time > max(self.profiled_latency) / self.b)
-        if AGGR:
+        
+        slowest_time = max(self.profiled_latency)
+        current_b = max(5, min(self.b, 15))  
+        
+        AGGR = (self.wall_clock_time - self.last_aggr_time > slowest_time / current_b)
+        
+        if AGGR and len(self.buffer) >= 3: 
             self.last_aggr_time = self.wall_clock_time
+            self.AGGR = True
             self.tensor2model(sum(self.buffer) / len(self.buffer))
+        else:
+            self.AGGR = False
 
     def update_status(self):
         # set the current client to idle
