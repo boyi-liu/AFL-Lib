@@ -54,7 +54,7 @@ class BaseClient():
         with open('utils/sys.yaml', 'r') as f:
             self.sysconfig = yaml.load(f.read(), Loader=yaml.Loader)
         self.delay = device_config(self.id, args.total_num)
-        self.comm_time = comm_config(self.id, args.total_num, self.model)
+        self.comm_time = comm_config(self.model)
 
     def run(self):
         raise NotImplementedError

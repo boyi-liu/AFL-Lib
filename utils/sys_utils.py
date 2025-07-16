@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import yaml
 
@@ -33,7 +35,7 @@ def device_config(id, client_num):
 
     return device_time[id]
 
-def comm_config(id, client_num, model):
+def comm_config(model):
     sys_config = system_config()
 
     comm = sys_config['comm']['comm']
@@ -45,11 +47,9 @@ def comm_config(id, client_num, model):
     # normalize
     prop = [p / sum(prop) for p in prop]
 
-    group_sizes = np.round(np.array(prop) * client_num).astype(int)
-    group_sizes[-1] += client_num - group_sizes.sum()
+    bandwidth = random.choices(comm, weights=prop, k=1)[0]
 
-    bandwidth = np.repeat([b for b in bandwidths], group_sizes)
-    return calculate_model_size(model) * 8 / bandwidth[id]
+    return calculate_model_size(model) * 8 / bandwidth
 
 def calculate_model_size(model):
     total_size = 0
