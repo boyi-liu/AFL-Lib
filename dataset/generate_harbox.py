@@ -41,7 +41,7 @@ def load_data(client_id):
 def generate_dataset(cfg):
     X = []
     y = []
-    for idx in range(1):
+    for idx in range(120):
         dataset_train, dataset_test = load_data(idx)
         X.append(dataset_train)
         y.append(dataset_test)
