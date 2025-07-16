@@ -4,23 +4,25 @@ import torchvision.models as models
 
 
 class Multimodal_Resnet18(nn.Module):
-    def __init__(self, args, num_classes):
+    def __init__(self, args):
         super().__init__()
         self.args = args
         self.fusion_mode = args.fusion
-        self.num_classes = num_classes
+        self.class_num = args.class_num
         self.feature_dim = 512
 
         if 'cremad' in args.dataset:
             self.encoders = nn.ModuleList([ImgEncoderResnet18(),
                                            AudioEncoderResnet18(), ])
+        else:
+            raise ValueError(f"Unsupported dataset {args.dataset} for Multimodal_Resnet18.")
 
         self.modality_num = len(self.encoders)
 
         if self.fusion_mode == 'concat':
-            self.head = ConcatHead(num_classes, self.modality_num, feature_dim=self.feature_dim)
+            self.head = ConcatHead(self.class_num, self.modality_num, feature_dim=self.feature_dim)
         elif self.fusion_mode == 'latesum':
-            self.head = LateSumHead(num_classes, self.modality_num, feature_dim=self.feature_dim)
+            self.head = LateSumHead(self.class_num, self.modality_num, feature_dim=self.feature_dim)
 
     def forward(self, x_list: list[torch.Tensor]):
         if len(x_list) != self.modality_num:
@@ -68,21 +70,21 @@ class AudioEncoderResnet18(nn.Module):
 
 
 class Head(nn.Module):
-    def __init__(self, num_classes, feature_dim):
+    def __init__(self, class_num, feature_dim):
         super(Head, self).__init__()
         self.feature_dim = feature_dim
-        self.classifier = nn.Linear(feature_dim, num_classes)
+        self.classifier = nn.Linear(feature_dim, class_num)
 
     # def forward(self, x):
     #     return self.classifier(x)
 
 
 class LateSumHead(Head):
-    def __init__(self, num_classes, modality_num, feature_dim):
-        super().__init__(num_classes, feature_dim)
+    def __init__(self, class_num, modality_num, feature_dim):
+        super().__init__(class_num, feature_dim)
         self.classifier = nn.ModuleList([
-            nn.Linear(feature_dim, num_classes),
-            nn.Linear(feature_dim, num_classes),
+            nn.Linear(feature_dim, class_num),
+            nn.Linear(feature_dim, class_num),
         ])
         self.modality_num = modality_num
 
@@ -96,9 +98,9 @@ class LateSumHead(Head):
 
 
 class ConcatHead(Head):
-    def __init__(self, num_classes, modality_num, feature_dim=512):
-        super().__init__(num_classes, feature_dim)
-        self.classifier = nn.Linear(feature_dim * modality_num, num_classes)
+    def __init__(self, class_num, modality_num, feature_dim=512):
+        super().__init__(class_num, feature_dim)
+        self.classifier = nn.Linear(feature_dim * modality_num, class_num)
 
     def forward(self, x_list: list[torch.Tensor]):
         for x in x_list:
@@ -113,5 +115,5 @@ class ConcatHead(Head):
         return x
 
 
-def multimodalresnet18_cremad(args, **kwargs):
-    return Multimodal_Resnet18(args, **kwargs)
+def multimodalresnet18_cremad(args):
+    return Multimodal_Resnet18(args)
