@@ -47,7 +47,7 @@ def comm_config(model):
     # normalize
     prop = [p / sum(prop) for p in prop]
 
-    bandwidth = random.choices(comm, weights=prop, k=1)[0]
+    bandwidth = random.choices(bandwidths, weights=prop, k=1)[0]
 
     return calculate_model_size(model) * 8 / bandwidth
 
