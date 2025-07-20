@@ -4,7 +4,7 @@
 
 Currently, we support: 
 
-+ 14 federated learning baselines, including 4 synchronous baselines, and 12 asynchronous baselines.
++ 15 federated learning baselines, including 5 synchronous baselines, and 12 asynchronous baselines.
 + Comprehensive simulation of system heterogeneity in asynchronous FL, including:
   + Device heterogeneity
   + Communication heterogeneity
@@ -20,6 +20,7 @@ Currently, we support:
 
 + **FedAvg**, [Communication-Efficient Learning of Deep Networks from Decentralized Data](https://proceedings.mlr.press/v54/mcmahan17a/mcmahan17a.pdf), *AISTATS 2017*
 + **FedProx**, [Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper_files/paper/2020/file/1f5fe83998a09396ebe6477d9475ba0c-Paper.pdf), *MLSys 2020*
++ **SCAFFOLD**, [SCAFFOLD: Stochastic Controlled Averaging for Federated Learning](https://proceedings.mlr.press/v119/karimireddy20a/karimireddy20a.pdf), *ICML 2020*
 + **MOON**, [Model Contrastive Federated Learning](https://openaccess.thecvf.com/content/CVPR2021/papers/Li_Model-Contrastive_Federated_Learning_CVPR_2021_paper.pdf), *CVPR 2021*
 + **rFedAvg**, [Distribution-Regularized Federated Learning on Non-IID Data](https://ieeexplore.ieee.org/document/10184650), *ICDE 2023*
 
