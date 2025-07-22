@@ -5,14 +5,14 @@ import yaml
 
 SCALE_FACTOR = 50
 
-# Training time of TX2, Nano, Pi
+# Training time of Jetson TX2, Jetson Nano, Raspberry Pi
 # `Benchmark Analysis of Jetson TX2, Jetson Nano and Raspberry PI using Deep-CNN`
 device_reference = [1, 1.8125, 11.625]
 
-# 4G, 20Mbps
-# WiFi, 100Mbps
-# 5G, 500Mbps
-bandwidths = [20, 100, 500]
+# WiFi, 150-600 Mbps
+# 4G, 20-100 Mbps
+# 5G, 50-1000 Mbps
+bandwidths = [(150, 600), (20, 100), (50, 1000)]
 
 
 def system_config():
@@ -47,7 +47,8 @@ def comm_config(model):
     # normalize
     prop = [p / sum(prop) for p in prop]
 
-    bandwidth = random.choices(bandwidths, weights=prop, k=1)[0]
+    min_bandwidth, max_bandwidth = random.choices(bandwidths, weights=prop, k=1)[0]
+    bandwidth = random.uniform(min_bandwidth, max_bandwidth)
 
     return calculate_model_size(model) * 8 / bandwidth
 

@@ -16,7 +16,7 @@ def time_record(func):
         self.training_time += self.comm_time * 2
 
         dropout = self.sysconfig['dropout']
-        if dropout['dropout'] and random.random() < dropout['drop_prob']:
+        if random.random() < dropout['drop_prob']:
             self.training_time += (random.random() * dropout['drop_latency'])
         return result
     return wrapper
