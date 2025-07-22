@@ -13,8 +13,7 @@ np.random.seed(1)
 
 def generate_dataset(cfg):
     dir_path = cfg['dir_path']
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+    os.makedirs(dir_path, exist_ok=True)
 
     if check(cfg): return
 
