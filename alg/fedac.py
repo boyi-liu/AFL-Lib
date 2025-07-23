@@ -30,6 +30,9 @@ class Client(AsyncBaseClient):
 
         self.dW = cur_model - self.prev_model
 
+    def comm_bytes(self):
+        model_tensor = self.model2tensor()
+        return model_tensor.numel() * model_tensor.element_size() + self.C.numel() + self.C.element_size()
 
 class Server(AsyncBaseServer):
     def __init__(self, id, args, clients):
