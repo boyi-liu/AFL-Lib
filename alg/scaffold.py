@@ -24,6 +24,9 @@ class Client(BaseClient):
         self.C = C_plus
         self.delta_W = self.model2tensor() - prev_model
 
+    def comm_bytes(self):
+        model_tensor = self.model2tensor()
+        return model_tensor.numel() * model_tensor.element_size() + self.C.numel() + self.C.element_size()
 
 class Server(BaseServer):
     def __init__(self, id, args, clients):
