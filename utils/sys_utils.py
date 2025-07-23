@@ -20,13 +20,29 @@ def system_config():
         sys_config = yaml.load(f.read(), Loader=yaml.Loader)
     return sys_config
 
-def device_config(id, client_num):
+def probs_to_counts(probs, total_count):
+    raw_counts = np.array(probs) * total_count
+    floored = np.floor(raw_counts).astype(int)
+    remainder = total_count - floored.sum()
+
+    fractional_parts = raw_counts - floored
+    indices = np.argsort(-fractional_parts)
+
+    for i in range(remainder):
+        floored[indices[i]] += 1
+
+    return floored.tolist()
+
+def device_config(client_num):
     sys_config = system_config()
     prop = sys_config['dev']['dev_prop']
     prop = list(map(float, prop.split(' ')))
-
-    # normalize
     prop = [p / sum(prop) for p in prop]
+
+    counts = probs_to_counts(prop, client_num)
+    result = [val for val, count in zip(device_reference, counts) for _ in range(count)]
+    random.shuffle(result)
+    return [r * SCALE_FACTOR for r in result]
 
     group_sizes = np.round(np.array(prop) * client_num).astype(int)
     group_sizes[-1] += client_num - group_sizes.sum()
@@ -35,17 +51,19 @@ def device_config(id, client_num):
 
     return device_time[id]
 
-def comm_config(model):
+def comm_config(client_num):
     sys_config = system_config()
-
     comm = sys_config['comm']['comm']
-    if not comm: return 0
+    if not comm: return [0 for _ in range(client_num)]
 
     prop = sys_config['comm']['comm_prop']
     prop = list(map(float, prop.split(' ')))
-
-    # normalize
     prop = [p / sum(prop) for p in prop]
+
+    counts = probs_to_counts(prop, client_num)
+    result = [val for val, count in zip(bandwidths, counts) for _ in range(count)]
+    random.shuffle(result)
+    return [random.uniform(min_bandwidth, max_bandwidth) for min_bandwidth, max_bandwidth in result]
 
     min_bandwidth, max_bandwidth = random.choices(bandwidths, weights=prop, k=1)[0]
     bandwidth = random.uniform(min_bandwidth, max_bandwidth)

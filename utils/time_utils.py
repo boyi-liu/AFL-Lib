@@ -2,6 +2,8 @@ import time
 import random
 
 from functools import wraps
+from utils.sys_utils import system_config
+
 
 def time_record(func):
     @wraps(func)
@@ -13,9 +15,10 @@ def time_record(func):
         self.training_time = execution_time * self.delay
 
         # downlink and uplink
-        self.training_time += self.comm_time * 2
+        comm_time = self.comm_bytes() * 8 / (1024 * 1024) / self.bandwidth
+        self.training_time += comm_time * 2
 
-        dropout = self.sysconfig['dropout']
+        dropout = system_config()['dropout']
         if random.random() < dropout['drop_prob']:
             self.training_time += (random.random() * dropout['drop_latency'])
         return result

@@ -51,10 +51,6 @@ class BaseClient():
             )
 
         self.training_time = None
-        with open('utils/sys.yaml', 'r') as f:
-            self.sysconfig = yaml.load(f.read(), Loader=yaml.Loader)
-        self.delay = device_config(self.id, args.total_num)
-        self.comm_time = comm_config(self.model)
 
     def run(self):
         raise NotImplementedError
@@ -136,6 +132,10 @@ class BaseClient():
                     param.copy_(tensor[param_index: param_index + param_size].view(param.shape).detach())
                     param_index += param_size
 
+    def comm_bytes(self):
+        model_tensor = self.model2tensor()
+        return model_tensor.numel() * model_tensor.element_size()
+
 class BaseServer(BaseClient):
     def __init__(self, id, args, clients):
         super().__init__(id, args)
@@ -149,8 +149,13 @@ class BaseServer(BaseClient):
         self.wall_clock_time = 0
         self.received_params = []
 
+        delays = device_config(self.client_num)
+        bandwidths = comm_config(self.client_num)
+
         for client in self.clients:
             client.server = self
+            client.delay = delays[client.id]
+            client.bandwidth = bandwidths[client.id]
 
     def run(self):
         raise NotImplementedError
